@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $logData = [$registrationNumber, $teamName, $password, date('Y-m-d H:i:s')];
 
     $sheetId = '1ZEBj7JAETOXOTTroH_bKqmUMJrveypT3JVIIifMDd5A'; // Replace with your actual Google Sheet ID
-    $apiKey = 'AIzaSyDb806fUu5h4V2tUP09dx8AJP53zQKXgjk'; // Replace this with a new, restricted API key
+    $apiKey = 'AIzaSyAqLRMomqPB6-MWBGzEUUKOinZIorf3w1s'; // Replace this with a new, restricted API key
     $range = 'login!A2:C'; // Reading the relevant range from the 'login' sheet
 
     try {
