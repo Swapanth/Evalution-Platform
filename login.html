@@ -13,38 +13,39 @@
     <div class="login-card">
         <div class="form-container">
             <h2 class="text-center">WEB TECH HACKATHON</h2>
-            <form class="needs-validation" novalidate>
+            <form class="needs-validation" novalidate action="login.php" method="POST">
                 <div>
-                    <label for="validationCustomEmail" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="validationCustomEmail" required>
+                    <label for="validationCustomRegNumber" class="form-label">Registration Number</label>
+                    <input type="text" class="form-control" id="validationCustomRegNumber" name="registration_number" required>
                     <div class="invalid-feedback">
-                        Please enter a valid email address.
+                        Please enter your registration number.
                     </div>
                 </div>
-
+    
                 <div>
-                    <label for="validationCustomSelect" class="form-label">Select Option</label>
-                    <select class="form-select" id="validationCustomSelect" required>
+                    <label for="validationCustomTeamName" class="form-label">Team Name</label>
+                    <select class="form-select" id="validationCustomTeamName" name="team_name" required>
                         <option selected disabled value="">Choose...</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <option value="Team A">Team A</option>
+                        <option value="Team B">Team B</option>
+                        <option value="Team C">Team C</option>
+                        <!-- Add more teams as needed -->
                     </select>
                     <div class="invalid-feedback">
-                        Please select an option.
+                        Please select your team name.
                     </div>
                 </div>
-
+    
                 <div>
                     <label for="floatingPassword" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+                    <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
                     <div class="invalid-feedback">
                         Please enter your password.
                     </div>
                 </div>
-
+    
                 <div class="form-check mt-3">
-                    <input class="form-check-input custom-checkbox" type="checkbox" id="invalidCheck" required style="width: 2px !important;">
+                    <input class="form-check-input custom-checkbox" type="checkbox" id="invalidCheck" name="termsAccepted" required>
                     <label class="form-check-label" for="invalidCheck">
                         Agree to terms and conditions
                     </label>
@@ -52,11 +53,12 @@
                         You must agree before submitting.
                     </div>
                 </div>
-
+    
                 <div class="text-center mt-4">
                     <button class="btn btn-primary" type="submit">Submit</button>
                 </div>
             </form>
+            
         </div>
 
         <div class="image-container"></div>
@@ -80,6 +82,4 @@
         })
 })()
 </script>
-
-</body>
-</html>
+ 

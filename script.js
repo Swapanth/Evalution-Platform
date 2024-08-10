@@ -1,5 +1,20 @@
-const teams = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa'];
+const sheetId = '1ZEBj7JAETOXOTTroH_bKqmUMJrveypT3JVIIifMDd5A'; // Replace with your Google Sheet ID
+const apiKey = 'AIzaSyDb806fUu5h4V2tUP09dx8AJP53zQKXgjk'; // Replace with your Google API key
+const range = 'teamnames!A2:A'; // Range where team names are stored, skipping the first row
+
+let teams = [];
 let finalSubmission = false;
+
+async function fetchTeamNames() {
+    try {
+        const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`);
+        const data = await response.json();
+        teams = data.values ? data.values.map(row => row[0]) : [];
+        initializeTeamCards();
+    } catch (error) {
+        console.error('Error fetching team names:', error);
+    }
+}
 
 function createTeamCard(team) {
     const card = document.createElement('div');
@@ -16,6 +31,7 @@ function createTeamCard(team) {
 
 function initializeTeamCards() {
     const container = document.getElementById('teamCardsContainer');
+    container.innerHTML = ''; // Clear any existing cards
     teams.forEach(team => {
         container.appendChild(createTeamCard(team));
         initializeRatingSlider(team);
@@ -163,7 +179,8 @@ function disableAllInputs() {
 }
 
 // Initialize the page
-initializeTeamCards();
+fetchTeamNames();
 setupSearch();
+
 
 document.getElementById('submitAllBtn').addEventListener('click', submitAllReviews);
