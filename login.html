@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improved Form</title>
+    <link rel="stylesheet" href="./css/login.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <div class="login-card">
+        <div class="form-container">
+            <h2 class="text-center">WEB TECH HACKATHON</h2>
+            <form class="needs-validation" novalidate>
+                <div>
+                    <label for="validationCustomEmail" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="validationCustomEmail" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid email address.
+                    </div>
+                </div>
+
+                <div>
+                    <label for="validationCustomSelect" class="form-label">Select Option</label>
+                    <select class="form-select" id="validationCustomSelect" required>
+                        <option selected disabled value="">Choose...</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select an option.
+                    </div>
+                </div>
+
+                <div>
+                    <label for="floatingPassword" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+                    <div class="invalid-feedback">
+                        Please enter your password.
+                    </div>
+                </div>
+
+                <div class="form-check mt-3">
+                    <input class="form-check-input custom-checkbox" type="checkbox" id="invalidCheck" required style="width: 2px !important;">
+                    <label class="form-check-label" for="invalidCheck">
+                        Agree to terms and conditions
+                    </label>
+                    <div class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="image-container"></div>
+    </div>
+</div>
+
+<script>
+// Bootstrap form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
+
+</body>
+</html>
