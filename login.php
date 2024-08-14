@@ -1,6 +1,6 @@
 <?php
 
-// Function to retrieve data from Google Sheet
+
 function getSheetData($sheetId, $apiKey, $range) {
     $url = "https://sheets.googleapis.com/v4/spreadsheets/{$sheetId}/values/{$range}?key={$apiKey}";
     $curl = curl_init();
@@ -55,6 +55,20 @@ function appendToSheet($sheetId, $apiKey, $data) {
 
     return json_decode($response, true);
 }
+// Function to check if team has already reviewed
+function hasTeamReviewed($sheetId, $apiKey, $teamName) {
+    $range = 'reviews!A:E'; // Adjust this range to cover all columns in your 'reviews' sheet
+    $sheetData = getSheetData($sheetId, $apiKey, $range);
+    
+    if (isset($sheetData['values'])) {
+        foreach ($sheetData['values'] as $row) {
+            if (isset($row[3]) && $row[3] === $teamName) { // Assuming 'reviewed_by' is the 5th column (index 4)
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -67,10 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Prepare data for logging
     $logData = [$registrationNumber, $teamName, $password, date('Y-m-d H:i:s')];
 
-    $sheetId = '1ZEBj7JAETOXOTTroH_bKqmUMJrveypT3JVIIifMDd5A'; // Replace with your actual Google Sheet ID
-    $apiKey = 'AIzaSyAqLRMomqPB6-MWBGzEUUKOinZIorf3w1s'; // Replace this with a new, restricted API key
-    $range = 'login!A2:C'; // Reading the relevant range from the 'login' sheet
-
+    $sheetId = ''; 
+    $apiKey = '';
+    $range = 'login!A2:C'; 
     try {
         // Append all attempts to the sheet
         appendToSheet($sheetId, $apiKey, $logData);
@@ -80,7 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Log the retrieved data for debugging
         error_log("Retrieved data: " . print_r($sheetData, true));
-        echo json_encode(['success' => true, 'message' => 'Data retrieved successfully']);
 
         // Check if the provided details exist in the sheet
         $exists = false;
@@ -96,9 +108,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($exists) {
-            echo json_encode(['success' => true, 'message' => 'Login information is valid']);
-            header('Location: form.html?teamName=' . urlencode($teamName));
-            // Proceed with any further actions, e.g., redirecting the user
+            // Check if the team has already reviewed
+            if (hasTeamReviewed($sheetId, $apiKey, $teamName)) {
+                echo json_encode(['success' => false, 'message' => 'Already reviewed']);
+            } else {
+                echo json_encode(['success' => true, 'message' => 'Login information is valid']);
+                header('Location: form.html?teamName=' . urlencode($teamName));
+            }
         } else {
             echo json_encode(['success' => false, 'message' => 'Invalid inputs']);
         }

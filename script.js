@@ -1,17 +1,40 @@
-const sheetId = "1ZEBj7JAETOXOTTroH_bKqmUMJrveypT3JVIIifMDd5A"; // Replace with your Google Sheet ID
-const apiKey = "AIzaSyDb806fUu5h4V2tUP09dx8AJP53zQKXgjk"; // Replace with your Google API key
-const range = "teamnames!A2:A"; // Range where team names are stored, skipping the first row
-
-let teams = [];
-let finalSubmission = false;
+const sheetId = "";
+const apiKey = "";
+const range = "teamnames!A2:A";
 
 async function fetchTeamNames() {
   try {
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
-    );
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+    console.log("Fetching from URL:", url);
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Response not OK. Status:", response.status, "Text:", errorText);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const data = await response.json();
-    teams = data.values ? data.values.map((row) => row[0]) : [];
+    
+    // Get the current user's team name
+    const currentTeam = getQueryParam("teamName");
+    console.log("Current team:", currentTeam);
+    
+    // Log all fetched team names
+    console.log("All fetched team names:", data.values ? data.values.map(row => row[0]) : []);
+    
+    // Filter out the current user's team
+    teams = data.values ? data.values
+      .map((row) => row[0])
+      .filter((team) => {
+        const keep = team.toLowerCase() !== currentTeam.toLowerCase();
+        console.log(`Team: ${team}, Keep: ${keep}`);
+        return keep;
+      }) : [];
+    
+    console.log("Filtered team names:", teams);
+    
     initializeTeamCards();
   } catch (error) {
     console.error("Error fetching team names:", error);
@@ -22,35 +45,35 @@ function initializeTeamCards() {
   const container = document.getElementById("teamCardsContainer");
   container.innerHTML = ""; // Clear any existing cards
   teams.forEach((team) => {
-    container.appendChild(createTeamCard(team));
-    initializeRatingSlider(team);
-    initializeSubmitButton(team);
+      container.appendChild(createTeamCard(team));
+      initializeRatingSlider(team);
+      initializeSubmitButton(team);
   });
 }
 
 function initializeRatingSlider(team) {
-    const slider = document.getElementById(`rating${team}`);
-    const ratingValue = document.getElementById(`ratingValue${team}`);
-    const ratingEmoji = ratingValue.querySelector('.rating-emoji');
+  const slider = document.getElementById(`rating${team}`);
+  const ratingValue = document.getElementById(`ratingValue${team}`);
+  const ratingEmoji = ratingValue.querySelector('.rating-emoji');
 
-    slider.addEventListener("input", function () {
-        // Update the rating value and emoji separately
-        ratingValue.firstChild.textContent = `${this.value} `;
-        updateEmoji(this.value, ratingEmoji);
-    });
+  slider.addEventListener("input", function () {
+      const value = this.value;
+      ratingValue.firstChild.textContent = `${value} `;
+      updateEmoji(value, ratingEmoji);
+  });
+
+  // Initialize the emoji based on the default value
+  updateEmoji(slider.value, ratingEmoji);
 }
 
 function updateEmoji(value, emojiElement) {
-    const emojis = ['😢', '😞', '😕', '😐', '🙂', '😊', '😄', '😃', '😍', '🤩'];
-    emojiElement.textContent = emojis[value - 1];
+  const emojis = ['😢', '😞', '😕', '😐', '🙂', '😊', '😄', '😃', '😍', '🤩'];
+  emojiElement.textContent = emojis[value - 1];
 }
 
 
 function toggleTeamReview(team) {
-    if (finalSubmission) {
-        showToast("Final submission has been made. Edits are no longer allowed.", "error");
-        return;
-    }
+    
 
     const rating = document.getElementById(`rating${team}`);
     const comment = document.getElementById(`comment${team}`);
@@ -81,31 +104,29 @@ function toggleTeamReview(team) {
         checkAllCompleted();
     }
 }
-
 function createTeamCard(team) {
-    const card = document.createElement('div');
-    card.className = 'team-card';
-    card.innerHTML = `
-        <h3>${team}</h3>
-        <input type="range" id="rating${team}" class="rating-slider" min="1" max="10" value="5">
-        <div class="rating-value" id="ratingValue${team}">5 <span class="rating-emoji">😐</span></div>
-        <textarea id="comment${team}" placeholder="Share your insights..."></textarea>
-        <button id="toggleBtn${team}">Submit</button>
-    `;
+  const card = document.createElement('div');
+  card.className = 'team-card';
+  card.innerHTML = `
+      <h3>${team}</h3>
+      <input type="range" id="rating${team}" class="rating-slider" min="1" max="10" value="5">
+      <div class="rating-value" id="ratingValue${team}">5 <span class="rating-emoji">😐</span></div>
+      <textarea id="comment${team}" placeholder="Share your insights..."></textarea>
+      <button id="toggleBtn${team}">Submit</button>
+  `;
 
-    const slider = card.querySelector('.rating-slider');
-    const ratingValue = card.querySelector('.rating-value');
-    const ratingEmoji = card.querySelector('.rating-emoji');
+  const slider = card.querySelector('.rating-slider');
+  const ratingValue = card.querySelector('.rating-value');
+  const ratingEmoji = ratingValue.querySelector('.rating-emoji');
 
-    slider.addEventListener('input', () => {
-        const value = slider.value;
-        ratingValue.textContent = `${value} `;
-        updateEmoji(value, ratingEmoji);
-    });
+  slider.addEventListener('input', () => {
+      const value = slider.value;
+      ratingValue.firstChild.textContent = `${value} `;
+      updateEmoji(value, ratingEmoji);
+  });
 
-    return card;
+  return card;
 }
-
 
 
 function initializeSubmitButton(team) {
