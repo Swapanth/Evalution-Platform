@@ -6,6 +6,8 @@
     <title>Improved Form</title>
     <link rel="stylesheet" href="./css/login.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
 </head>
 <body>
 
@@ -22,15 +24,11 @@
                     </div>
                 </div>
     
-                <div>
-                    <label for="validationCustomTeamName" class="form-label">Team Name</label>
-                    <select class="form-select" id="validationCustomTeamName" name="team_name" required>
-                        <option selected disabled value="">Choose...</option>
-                        <option value="Team A">Team A</option>
-                        <option value="Team B">Team B</option>
-                        <option value="Team C">Team C</option>
-                        <!-- Add more teams as needed -->
-                    </select>
+                <div class="team-select-container">
+                    <label for="teamSearchInput" class="form-label">Team Name</label>
+                    <input type="text" id="teamSearchInput" class="form-control" placeholder="Search for your team..." autocomplete="off">
+                    <div id="teamDropdown" class="team-dropdown"></div>
+                    <input type="hidden" id="validationCustomTeamName" name="team_name" required>
                     <div class="invalid-feedback">
                         Please select your team name.
                     </div>
@@ -64,7 +62,6 @@
         <div class="image-container"></div>
     </div>
 </div>
-
 <script>
 // Bootstrap form validation
 (function () {
@@ -81,5 +78,111 @@
             }, false)
         })
 })()
+</script>
+
+<style>
+
+    
+.team-select-container {
+    position: relative;
+}
+
+.team-dropdown {
+    display: none;
+    position: absolute;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    background-color: white;
+    z-index: 1000;
+}
+
+.team-dropdown div {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.team-dropdown div:hover {
+    background-color: #f8f9fa;
+}
+
+/* Custom scrollbar styles */
+.team-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.team-dropdown::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.team-dropdown::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.team-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+</style>
+
+<script>
+const sheetId = "";
+    const apiKey = "";
+    const range = "teamnames!A2:A";
+    
+    async function fetchTeamNames() {
+        try {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.values ? data.values.map(row => row[0]) : [];
+        } catch (error) {
+            console.error("Error fetching team names:", error);
+            return [];
+        }
+    }
+    
+    async function initializeTeamSelect() {
+        const teamNames = await fetchTeamNames();
+        const searchInput = document.getElementById('teamSearchInput');
+        const dropdown = document.getElementById('teamDropdown');
+        const hiddenInput = document.getElementById('validationCustomTeamName');
+    
+        function updateDropdown(filter = '') {
+            dropdown.innerHTML = '';
+            const filteredNames = teamNames.filter(name => 
+                name.toLowerCase().includes(filter.toLowerCase())
+            );
+            filteredNames.forEach(name => {
+                const div = document.createElement('div');
+                div.textContent = name;
+                div.onclick = () => {
+                    searchInput.value = name;
+                    hiddenInput.value = name;
+                    dropdown.style.display = 'none';
+                };
+                dropdown.appendChild(div);
+            });
+            dropdown.style.display = filteredNames.length > 0 ? 'block' : 'none';
+        }
+    
+        searchInput.addEventListener('focus', () => updateDropdown());
+        searchInput.addEventListener('input', () => updateDropdown(searchInput.value));
+        searchInput.addEventListener('blur', () => {
+            setTimeout(() => dropdown.style.display = 'none', 200);
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', initializeTeamSelect);
+    
+    // Keep your existing Bootstrap validation code here
 </script>
  
