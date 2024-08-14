@@ -73,9 +73,9 @@ function hasTeamReviewed($sheetId, $apiKey, $teamName) {
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate and sanitize input
-    $registrationNumber = filter_input(INPUT_POST, 'registration_number', FILTER_SANITIZE_STRING);
-    $teamName = filter_input(INPUT_POST, 'team_name', FILTER_SANITIZE_STRING);
-    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+    $registrationNumber = filter_input(INPUT_POST, 'registration_number');
+    $teamName = filter_input(INPUT_POST, 'team_name');
+    $password = filter_input(INPUT_POST, 'password');
     $termsAccepted = filter_input(INPUT_POST, 'termsAccepted', FILTER_VALIDATE_BOOLEAN);
 
     // Prepare data for logging
